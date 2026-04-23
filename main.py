@@ -1,36 +1,25 @@
-from src.models.desconto import DescontoVIP
+from src.controllers.pedido_controller import PedidoController
+from src.repositories.pedido_repository import PedidoRepository
+from src.services.pedido_service import PedidoService
+from src.database.connection import DatabaseConnection
 from src.models.pedido import Pedido
+from src.models.desconto import DescontoNormal, DescontoVIP, DescontoPremium
 
 if __name__ == "__main__":
-    pedido = Pedido("Leonardo", DescontoVIP())
+    database = DatabaseConnection()
+    repo = PedidoRepository(database)
+    service = PedidoService(repo)
+    controller = PedidoController(service)
 
-    valor_final = pedido.valor_final(100)
-    print(f"Cliente: {pedido.cliente}")
-    print(f"Valor final: {valor_final}")
+    pedido1 = Pedido("Cliente 1", DescontoNormal())
+    pedido1.valor_original = 100.0
+    pedido2 = Pedido("Cliente 2", DescontoVIP())
+    pedido2.valor_original = 100.0
+    pedido3 = Pedido("Cliente 3", DescontoPremium())
+    pedido3.valor_original = 100.0
 
+    controller.adicionar_pedido(pedido1)
+    controller.adicionar_pedido(pedido2)
+    controller.adicionar_pedido(pedido3)
 
-
-# from src.services.pedido_service import PedidoService
-# from src.models.desconto import DescontoNormal, DescontoVIP, DescontoPremium
-# from src.models.pedido import Pedido
-
-# if __name__ == "__main__":
-#     service = PedidoService()
-
-#     """Criando pedidos e aplicando descontos"""
-
-#     pedido1 = Pedido("Cliente A", DescontoNormal())
-#     pedido1.valor_original = 100.0  # Definindo o valor original do pedido
-
-#     pedido2 = Pedido("Cliente B", DescontoVIP())
-#     pedido2.valor_original = 200.0  # Definindo o valor original do pedido
-
-#     pedido3 = Pedido("Cliente C", DescontoPremium())
-#     pedido3.valor_original = 300.0  # Definindo o valor original do pedido
-
-#     # Aqui você pode criar pedidos, aplicar descontos e processar os pedidos
-#     service.adicionar_pedido(pedido1)
-#     service.adicionar_pedido(pedido2)
-#     service.adicionar_pedido(pedido3)
-
-#     service.processar_pedidos()
+    controller.processar_pedidos()

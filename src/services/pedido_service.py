@@ -3,8 +3,8 @@ from src.models.pedido import Pedido
 class PedidoService:
     """Classe de serviço para processar pedidos e aplicar descontos."""
 
-    def __init__(self):
-        self.pedidos = []
+    def __init__(self, repository):
+        self.pedidos = repository
 
     def adicionar_pedido(self, pedido: Pedido):
         self.pedidos.append(pedido)
