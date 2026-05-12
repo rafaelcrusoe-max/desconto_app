@@ -1,4 +1,4 @@
-from src.models.pedido import Pedido
+from src.app.models.pedido import Pedido
 from src.services.pedido_service import PedidoService
 
 class PedidoController:
