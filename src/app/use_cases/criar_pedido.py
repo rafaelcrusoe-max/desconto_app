@@ -4,6 +4,7 @@ from src.app.gateways.pedido_gateway import IPedidoGateway
 from src.app.dtos.criar_pedido_input_dto import CriarPedidoInputDTO
 from src.app.dtos.criar_pedido_output_dto import CriarPedidoOutputDTO
 
+
 class CriarPedido:
     def __init__(self, pedido_gateway: IPedidoGateway):
         self.pedido_gateway = pedido_gateway
@@ -14,39 +15,48 @@ class CriarPedido:
             desconto = DescontoNormal()
         elif tipo_desconto.lower() == "vip":
             desconto = DescontoVIP()
-        elif tipo_desconto.lower == "premium":
+        elif tipo_desconto == "premium":
             desconto = DescontoPremium()
         else:
             raise ValueError("Tipo de desconto inválido")
-        
-        pedido = Pedido(input_dto.cliente, input_dto.valor_original, desconto)
-        self.pedido_gateway.salvar(pedido)
+
+        pedido = Pedido(
+            cliente=input_dto.cliente,
+            valor_original=input_dto.valor_original,
+            desconto=desconto
+        )
+
+        # salva no repositório (gateway)
+        self.pedido_gateway.salvar(pedido, tipo_desconto)
 
         return CriarPedidoOutputDTO(
             cliente=pedido.cliente,
             valor_original=pedido.valor_original,
-            valor_desconto=pedido.valor_desconto,
-            valor_final=pedido.valor_final,
-            tipo_desconto=pedido.tipo_desconto
+            valor_desconto=pedido.valor_desconto(),
+            valor_final=pedido.valor_final(),
+            tipo_desconto=tipo_desconto
         )
 
     def listar_pedido(self) -> list[Pedido]:
         return self.pedido_gateway.listar()
     
     def listar_pedidos(self) -> list[CriarPedidoOutputDTO]:
-        pedidos = self.pedido_gateway.listar()
+        registros = self.pedido_gateway.listar()
 
-        lista_dto = []
+        lista = []
 
-        for registro in pedidos:
+        for registro in registros:
             pedido = registro["pedido"]
+            tipo_desconto = registro["tipo_desconto"]
+
             dto = CriarPedidoOutputDTO(
                 cliente=pedido.cliente,
                 valor_original=pedido.valor_original,
                 valor_desconto=pedido.valor_desconto(),
                 valor_final=pedido.valor_final(),
-                tipo_desconto=registro["tipo_desconto"]
+                tipo_desconto=tipo_desconto
             )
-            lista_dto.append(dto)
 
-        return lista_dto
+            lista.append(dto)
+
+        return lista
